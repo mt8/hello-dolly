@@ -37,6 +37,10 @@ jobs:
           chmod +x wp-cli.phar
           mv wp-cli.phar /usr/local/bin/wp
 
+      - name: Make WordPress Directory
+        run: >
+          mkdir /tmp/wordpress
+
       - name: Configure WordPress
         run: >
           wp config create
