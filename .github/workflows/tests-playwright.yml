@@ -1,70 +1,75 @@
 name: Playwright Tests
 
-on:
-  pull_request:
-    branches:
-      - trunk
+on: [pull_request]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        wordpress-version: [6.4, 6.5, 6.6]
+    tag:
+        name: WP ${{ matrix.wp }} / PHP ${{ matrix.php }} Tests
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+              php: ['8.1','8.2']
+              wp:  ['6.4','6.5','6.6']
+        services:
+            mysql:
+                image: mysql:8.0
+                env:
+                  MYSQL_ALLOW_EMPTY_PASSWORD: true
+                  MYSQL_ROOT_PASSWORD: root
+                  MYSQL_DATABASE: wordpress_test
+                ports:
+                  - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        steps:
+        - name: Checkout
+          uses: actions/checkout@master
+        - name: PHP ${{ matrix.php }} / WordPress ${{ matrix.wp }} / WooCommerce ${{ matrix.woo }} Test
+          uses: shivammathur/setup-php@v2
+          with:
+            php-version: ${{ matrix.php }}
+            extensions: mbstring, intl, mysqli
+            ini-values: post_max_size=256M
+        - name: Set up Node.js
+          uses: actions/setup-node@v2
+          with:
+            node-version: '18.17'
+        - name: Install dependencies
+          run: npm install
+      
+        - name: Install WP-CLI
+          run: |
+            curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+            chmod +x wp-cli.phar
+            mv wp-cli.phar /usr/local/bin/wp
 
-    services:
-      wordpress:
-        image: wordpress:latest
-        ports:
-          - 8888:80
-        options: >-
-          --health-cmd="curl --fail http://localhost:80/wp-admin/install.php || exit 1"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-        env:
-          WORDPRESS_DB_HOST: 127.0.0.1
-          WORDPRESS_DB_USER: root
-          WORDPRESS_DB_PASSWORD: root
-          WORDPRESS_DB_NAME: wordpress
+            - name: Configure WordPress
+            run: >
+              wp config create
+              --allow-root
+              --dbname=wordpress_test
+              --dbuser=root
+              --dbpass=root
+              --dbhost=127.0.0.1
+              --locale=ja
+              --force
+          working-directory: /tmp/wordpress
+    
+        - name: Install WordPress
+          run: >
+              wp core install
+              --allow-root
+              --url=localhost
+              --title=WP
+              --admin_user=admin
+              --admin_email=admin@example.com
+              --admin_password=password
+              --skip-email
+          working-directory: /tmp/wordpress
+    
+        - name: Update WordPress(minor)
+          run: >
+              wp core update --minor
+          working-directory: /tmp/wordpress            
 
-      mysql:
-        image: mysql:8.0
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: wordpress
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18.17'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Wait for WordPress to be ready
-      run: |
-        for i in `seq 1 30`; do
-          curl -sSf http://localhost:8888/wp-admin/install.php && break
-          echo "Waiting for WordPress to be ready..."
-          sleep 5
-        done
-
-    - name: Install WP-CLI
-      run: |
-        curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-        chmod +x wp-cli.phar
-        sudo mv wp-cli.phar /usr/local/bin/wp
-
-    - name: Set up WordPress
-      run: |
-        wp core install --version=${{ matrix.wordpress-version }} --url="http://localhost:8888" --title="Test Site" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com" --path="/var/www/html" --allow-root
-
-    - name: Run Playwright tests
-      run: npm run test:playwright
+        - name: Run Playwright tests
+          run: npm run test:playwright
