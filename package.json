@@ -1,0 +1,11 @@
+{
+  "name": "hello-dolly",
+  "scripts": {
+    "test:playwright": "wp-scripts test-playwright",
+    "test:playwright:debug": "wp-scripts test-playwright --debug",
+    "wp-env": "wp-env"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^28.3.0"
+  }
+}
