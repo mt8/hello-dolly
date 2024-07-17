@@ -6,6 +6,7 @@
     "wp-env": "wp-env"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^28.3.0"
+    "@wordpress/scripts": "^28.3.0",
+    "@wordpress/env": "^2.0.0"
   }
 }
