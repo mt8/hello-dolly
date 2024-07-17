@@ -14,7 +14,7 @@ jobs:
 
     services:
       wordpress:
-        image: wordpress:${{ matrix.wordpress-version }}.latest
+        image: wordpress:latest
         ports:
           - 8888:80
         options: >-
@@ -64,7 +64,7 @@ jobs:
 
     - name: Set up WordPress
       run: |
-        wp core install --url="http://localhost:8888" --title="Test Site" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com" --path="/var/www/html" --allow-root
+        wp core install --version=${{ matrix.wordpress-version }} --url="http://localhost:8888" --title="Test Site" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com" --path="/var/www/html" --allow-root
 
     - name: Run Playwright tests
       run: npm run test:playwright
