@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@master
 
-      - name: PHP ${{ matrix.php }} / WordPress ${{ matrix.wp }} / WooCommerce ${{ matrix.woo }} Test
+      - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -40,6 +40,14 @@ jobs:
       - name: Make WordPress Directory
         run: >
           mkdir /tmp/wordpress
+
+      - name: Download WordPress Core
+        run: >
+          wp core download
+          --allow-root
+          --path=/tmp/wordpress
+          --version=${{ matrix.wp }}
+        working-directory: /tmp/wordpress
 
       - name: Configure WordPress
         run: >
