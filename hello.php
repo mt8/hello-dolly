@@ -1,8 +1,11 @@
 <?php
 /**
+ * Plugin Name: Hello Dolly
+ *
  * @package Hello_Dolly
  * @version 1.7.2
  */
+
 /*
 Plugin Name: Hello Dolly
 Plugin URI: http://wordpress.org/plugins/hello-dolly/
@@ -12,6 +15,12 @@ Version: 1.7.2
 Author URI: http://ma.tt/
 */
 
+/**
+ *  Get a lyric from Hello Dolly.
+ *
+ * @since 1.7.0
+ * @return string
+ */
 function hello_dolly_get_lyric() {
 	/** These are the lyrics to Hello Dolly */
 	$lyrics = "Hello, Dolly
@@ -46,10 +55,15 @@ Dolly'll never go away again";
 	$lyrics = explode( "\n", $lyrics );
 
 	// And then randomly choose a line.
-	return wptexturize( $lyrics[ mt_rand( 0, count( $lyrics ) - 1 ) ] );
+	return wptexturize( $lyrics[ wp_rand( 0, count( $lyrics ) - 1 ) ] );
 }
 
-// This just echoes the chosen line, we'll position it later.
+/**
+ * This just echoes the chosen line, we'll position it later.
+ *
+ * @since 1.7.0
+ * @return void
+ */
 function hello_dolly() {
 	$chosen = hello_dolly_get_lyric();
 	$lang   = '';
@@ -59,16 +73,21 @@ function hello_dolly() {
 
 	printf(
 		'<p id="dolly"><span class="screen-reader-text">%s </span><span dir="ltr"%s>%s</span></p>',
-		__( 'Quote from Hello Dolly song, by Jerry Herman:', 'hello-dolly' ),
-		$lang,
-		$chosen
+		esc_html( __( 'Quote from Hello Dolly song, by Jerry Herman:', 'hello-dolly' ) ),
+		esc_html( $lang ),
+		esc_html( $chosen )
 	);
 }
 
 // Now we set that function up to execute when the admin_notices action is called.
 add_action( 'admin_notices', 'hello_dolly' );
 
-// We need some CSS to position the paragraph.
+/**
+ * Enqueue the styles for the Hello Dolly.
+ *
+ * @since 1.7.0
+ * @return void
+ */
 function dolly_css() {
 	echo "
 	<style type='text/css'>
