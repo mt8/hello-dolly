@@ -1,0 +1,16 @@
+{
+    "name": "mt8/hello-dolly",
+    "require-dev": {
+        "wp-coding-standards/wpcs": "^3.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "scripts": {
+        "lint" : "phpcs --standard=WordPress hello.php",
+        "format" : "phpcbf --standard=WordPress hello.php"
+
+    }
+}
