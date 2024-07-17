@@ -1,82 +1,78 @@
 name: Playwright Tests
-
 on: [pull_request]
 
 jobs:
-    tag:
-        name: WP ${{ matrix.wp }} / PHP ${{ matrix.php }} Tests
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-              php: ['8.1','8.2']
-              wp:  ['6.4','6.5','6.6']
-        services:
-            mysql:
-                image: mysql:8.0
-                env:
-                  MYSQL_ALLOW_EMPTY_PASSWORD: true
-                  MYSQL_ROOT_PASSWORD: root
-                  MYSQL_DATABASE: wordpress_test
-                ports:
-                  - 3306:3306
-                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-        steps:
-        - name: Checkout
-          uses: actions/checkout@master
+  tag:
+    name: WP ${{ matrix.wp }} / PHP ${{ matrix.php }} Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.1','8.2']
+        wp:  ['6.4','6.5','6.6']
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
 
-        - name: PHP Setup
-          uses: shivammathur/setup-php@v2
-          with:
-            php-version: ${{ matrix.php }}
-            extensions: mbstring, intl, mysqli
-            ini-values: post_max_size=256M
+      - name: Checkout
+        uses: actions/checkout@master
 
-        - name: Set up Node.js
-          uses: actions/setup-node@v2
-          with:
-            node-version: '18.17'
+      - name: PHP ${{ matrix.php }} / WordPress ${{ matrix.wp }} / WooCommerce ${{ matrix.woo }} Test
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, intl, mysqli
+          ini-values: post_max_size=256M
 
-        - name: Install dependencies
-          run: npm install
-      
-        - name: Install WP-CLI
-          run: |
-            curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-            chmod +x wp-cli.phar
-            mv wp-cli.phar /usr/local/bin/wp
+      - name: Install WP-CLI
+        run: |
+          curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x wp-cli.phar
+          mv wp-cli.phar /usr/local/bin/wp
 
-        - name: Make WordPress Dir
-          run: >
-            mkdir /tmp/wordpress
+      - name: Configure WordPress
+        run: >
+          wp config create
+          --allow-root
+          --dbname=wordpress_test
+          --dbuser=root
+          --dbpass=root
+          --dbhost=127.0.0.1
+          --locale=ja
+          --force
+        working-directory: /tmp/wordpress
 
-        - name: Configure WordPress
-          run: >
-            wp config create
-            --allow-root
-            --dbname=wordpress_test
-            --dbuser=root
-            --dbpass=root
-            --dbhost=127.0.0.1
-            --locale=ja
-            --force
-          working-directory: /tmp/wordpress
-    
-        - name: Install WordPress
-          run: >
-              wp core install
-              --allow-root
-              --url=localhost
-              --title=WP
-              --admin_user=admin
-              --admin_email=admin@example.com
-              --admin_password=password
-              --skip-email
-          working-directory: /tmp/wordpress
-    
-        - name: Update WordPress(minor)
-          run: >
-              wp core update --minor
-          working-directory: /tmp/wordpress            
+      - name: Install WordPress
+        run: >
+          wp core install
+          --allow-root
+          --url=localhost
+          --title=WP
+          --admin_user=admin
+          --admin_email=admin@example.com
+          --admin_password=password
+          --skip-email
+        working-directory: /tmp/wordpress
 
-        - name: Run Playwright tests
-          run: npm run test:playwright
+      - name: Update WordPress(minor)
+        run: >
+          wp core update --minor
+        working-directory: /tmp/wordpress
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.17'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Playwright tests
+        run: npm run test:playwright
