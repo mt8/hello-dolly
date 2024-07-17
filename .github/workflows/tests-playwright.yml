@@ -1,0 +1,70 @@
+name: Playwright Tests
+
+on:
+  pull_request:
+    branches:
+      - trunk
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        wordpress-version: [6.4, 6.5, 6.6]
+
+    services:
+      wordpress:
+        image: wordpress:${{ matrix.wordpress-version }}.latest
+        ports:
+          - 8888:80
+        options: >-
+          --health-cmd="curl --fail http://localhost:80/wp-admin/install.php || exit 1"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        env:
+          WORDPRESS_DB_HOST: 127.0.0.1
+          WORDPRESS_DB_USER: root
+          WORDPRESS_DB_PASSWORD: root
+          WORDPRESS_DB_NAME: wordpress
+
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.17'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Wait for WordPress to be ready
+      run: |
+        for i in `seq 1 30`; do
+          curl -sSf http://localhost:8888/wp-admin/install.php && break
+          echo "Waiting for WordPress to be ready..."
+          sleep 5
+        done
+
+    - name: Install WP-CLI
+      run: |
+        curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+        chmod +x wp-cli.phar
+        sudo mv wp-cli.phar /usr/local/bin/wp
+
+    - name: Set up WordPress
+      run: |
+        wp core install --url="http://localhost:8888" --title="Test Site" --admin_user="admin" --admin_password="password" --admin_email="admin@example.com" --path="/var/www/html" --allow-root
+
+    - name: Run Playwright tests
+      run: npm run test:playwright
