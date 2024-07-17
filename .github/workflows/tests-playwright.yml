@@ -23,16 +23,19 @@ jobs:
         steps:
         - name: Checkout
           uses: actions/checkout@master
-        - name: PHP ${{ matrix.php }} / WordPress ${{ matrix.wp }} / WooCommerce ${{ matrix.woo }} Test
+
+        - name: PHP Setup
           uses: shivammathur/setup-php@v2
           with:
             php-version: ${{ matrix.php }}
             extensions: mbstring, intl, mysqli
             ini-values: post_max_size=256M
+
         - name: Set up Node.js
           uses: actions/setup-node@v2
           with:
             node-version: '18.17'
+
         - name: Install dependencies
           run: npm install
       
@@ -41,6 +44,10 @@ jobs:
             curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
             chmod +x wp-cli.phar
             mv wp-cli.phar /usr/local/bin/wp
+
+        - name: Make WordPress Dir
+          run: >
+            mkdir /tmp/wordpress
 
         - name: Configure WordPress
           run: >
