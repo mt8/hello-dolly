@@ -2,9 +2,9 @@
   "name": "hello-dolly",
   "scripts": {
     "test:lint": "composer run lint",
-    "test:playwright": "wp-scripts test-playwright",
-    "test:playwright:debug": "wp-scripts test-playwright --debug",
-    "test": "npm run test:lint && npm run test:playwright",
+    "test:e2e": "wp-scripts test-playwright",
+    "test:e2e:debug": "wp-scripts test-playwright --debug",
+    "test": "npm run test:lint && npm run test:e2e",
     "wp-env": "wp-env",
     "prepare": "husky"
   },
