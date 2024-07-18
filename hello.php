@@ -1,5 +1,5 @@
 <?php
-/**  
+/** 
  * Plugin Name: Hello Dolly
  *
  * @package Hello_Dolly
