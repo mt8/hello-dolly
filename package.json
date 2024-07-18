@@ -1,20 +1,15 @@
 {
   "name": "hello-dolly",
   "scripts": {
-    "test:lint" : "composer run lint",
+    "test:lint": "composer run lint",
     "test:playwright": "wp-scripts test-playwright",
     "test:playwright:debug": "wp-scripts test-playwright --debug",
-    "test" : "npm run test:lint && npm run test:playwright",
-    "wp-env": "wp-env"
+    "test": "npm run test:lint && npm run test:playwright",
+    "wp-env": "wp-env",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@wordpress/scripts": "^28.3.0",
     "husky": "^9.1.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm test",
-      "pre-push": "npm test"
-    }
-  }  
+  }
 }
