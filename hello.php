@@ -10,7 +10,7 @@
  * Version: 1.7.2
  * Author URI: https://mt8.biz/
  * Tested up to: 6.6
- * Requires at least: 6.3
+ * Requires at least: 4.6
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Original Plugin URI: http://wordpress.org/plugins/hello-dolly/

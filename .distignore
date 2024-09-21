@@ -1,0 +1,12 @@
+github/
+husky/
+artifacts/
+node_modules/
+vendor/
+.gitignore
+.wp-env.override.json
+composer.json
+composer.lock
+package-lock.json
+package.json
+playwright.config.js
