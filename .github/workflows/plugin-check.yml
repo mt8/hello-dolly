@@ -15,6 +15,12 @@ jobs:
 
     - name: Remove files/directories which listed on .distignore
       run: |
-        while IFS= read -r line; do if [[ "$line" == \#* ]] || [ -z "$line" ]; then continue fi if [ -e "$TARGET_DIR/$line" ]; then rm -rf "$TARGET_DIR/$line" echo "Deleted: $TARGET_DIR/$line" else echo "Not found: $TARGET_DIR/$line" fi done < ".distignore"
+        rm -rf .husky/
+        rm -rf tests/
+        rm .distignore
+        rm .gitignore
+        rm .wp-env.json
+        rm .wp-env.override.json
+        rm playwright.config.js
     - name: Run plugin check
       uses: wordpress/plugin-check-action@v1
