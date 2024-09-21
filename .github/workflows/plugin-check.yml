@@ -20,7 +20,6 @@ jobs:
         rm .distignore
         rm .gitignore
         rm .wp-env.json
-        rm .wp-env.override.json
         rm playwright.config.js
     - name: Run plugin check
       uses: wordpress/plugin-check-action@v1
