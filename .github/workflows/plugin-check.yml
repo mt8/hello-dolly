@@ -13,5 +13,8 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - name: Remove files/directories which listed on .distignore
+      run: |
+        while IFS= read -r line; do if [[ "$line" == \#* ]] || [ -z "$line" ]; then continue fi if [ -e "$TARGET_DIR/$line" ]; then rm -rf "$TARGET_DIR/$line" echo "Deleted: $TARGET_DIR/$line" else echo "Not found: $TARGET_DIR/$line" fi done < ".distignore"
     - name: Run plugin check
       uses: wordpress/plugin-check-action@v1

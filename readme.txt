@@ -3,6 +3,7 @@ Contributors: matt, wordpressdotorg
 Stable tag: 1.7.2
 Tested up to: 6.6
 Requires at least: 4.6
+License: GPL v2 or later
 
 This is not just a plugin, it symbolizes the hope and enthusiasm of an entire generation summed up in two words sung most famously by Louis Armstrong.
 
