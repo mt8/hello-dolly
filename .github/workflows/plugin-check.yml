@@ -12,14 +12,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-
-    - name: Remove files/directories which listed on .distignore
+    - name: Remove .env files
       run: |
-        rm -rf .husky/
-        rm -rf tests/
         rm .distignore
         rm .gitignore
-        rm .wp-env.json
-        rm playwright.config.js
     - name: Run plugin check
       uses: wordpress/plugin-check-action@v1
